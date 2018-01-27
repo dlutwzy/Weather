@@ -131,6 +131,10 @@
 		553614A2201C4BCC00A839BF /* Weather */ = {
 			isa = PBXGroup;
 			children = (
+				55893722201C710200530B66 /* Config */,
+				55893721201C709800530B66 /* Model */,
+				55893720201C709100530B66 /* Extension */,
+				5589371F201C707F00530B66 /* Network */,
 				553614D3201C606A00A839BF /* UI */,
 				553614D2201C5FF800A839BF /* Resources */,
 				553614A3201C4BCC00A839BF /* AppDelegate.swift */,
@@ -199,6 +203,34 @@
 				553614D9201C65AE00A839BF /* Home.storyboard */,
 			);
 			path = StoryBoards;
+			sourceTree = "<group>";
+		};
+		5589371F201C707F00530B66 /* Network */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Network;
+			sourceTree = "<group>";
+		};
+		55893720201C709100530B66 /* Extension */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Extension;
+			sourceTree = "<group>";
+		};
+		55893721201C709800530B66 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		55893722201C710200530B66 /* Config */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Config;
 			sourceTree = "<group>";
 		};
 		578393930462FB7608EC9120 /* Frameworks */ = {
