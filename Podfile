@@ -11,6 +11,9 @@ target 'Weather' do
   
   pod 'RxSwift',    '~> 4.0'
   pod 'RxCocoa',    '~> 4.0'
+
+  pod 'MJRefresh', '~> 3.1.15'
+  pod 'ForecastIO', '~> 5.0.0'
   
   # Pods for tools
   pod 'R.swift',    '~> 4.0'

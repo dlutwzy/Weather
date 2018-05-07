@@ -13,6 +13,7 @@ struct R: Rswift.Validatable {
   fileprivate static let hostingBundle = Bundle(for: R.Class.self)
   
   static func validate() throws {
+    try font.validate()
     try intern.validate()
   }
   
@@ -21,18 +22,55 @@ struct R: Rswift.Validatable {
     fileprivate init() {}
   }
   
-  /// This `R.file` struct is generated, and contains static references to 0 files.
+  /// This `R.file` struct is generated, and contains static references to 2 files.
   struct file {
+    /// Resource file `Climacons.ttf`.
+    static let climaconsTtf = Rswift.FileResource(bundle: R.hostingBundle, name: "Climacons", pathExtension: "ttf")
+    /// Resource file `Default-568h@2x.png`.
+    static let default568h2xPng = Rswift.FileResource(bundle: R.hostingBundle, name: "Default-568h@2x", pathExtension: "png")
+    
+    /// `bundle.url(forResource: "Climacons", withExtension: "ttf")`
+    static func climaconsTtf(_: Void = ()) -> Foundation.URL? {
+      let fileResource = R.file.climaconsTtf
+      return fileResource.bundle.url(forResource: fileResource)
+    }
+    
+    /// `bundle.url(forResource: "Default-568h@2x", withExtension: "png")`
+    static func default568h2xPng(_: Void = ()) -> Foundation.URL? {
+      let fileResource = R.file.default568h2xPng
+      return fileResource.bundle.url(forResource: fileResource)
+    }
+    
     fileprivate init() {}
   }
   
-  /// This `R.font` struct is generated, and contains static references to 0 fonts.
-  struct font {
+  /// This `R.font` struct is generated, and contains static references to 1 fonts.
+  struct font: Rswift.Validatable {
+    /// Font `Climacons`.
+    static let climacons = Rswift.FontResource(fontName: "Climacons")
+    
+    /// `UIFont(name: "Climacons", size: ...)`
+    static func climacons(size: CGFloat) -> UIKit.UIFont? {
+      return UIKit.UIFont(resource: climacons, size: size)
+    }
+    
+    static func validate() throws {
+      if R.font.climacons(size: 42) == nil { throw Rswift.ValidationError(description:"[R.swift] Font 'Climacons' could not be loaded, is 'Climacons.ttf' added to the UIAppFonts array in this targets Info.plist?") }
+    }
+    
     fileprivate init() {}
   }
   
-  /// This `R.image` struct is generated, and contains static references to 0 images.
+  /// This `R.image` struct is generated, and contains static references to 1 images.
   struct image {
+    /// Image `Default-568h`.
+    static let default568h = Rswift.ImageResource(bundle: R.hostingBundle, name: "Default-568h")
+    
+    /// `UIImage(named: "Default-568h", bundle: ..., traitCollection: ...)`
+    static func default568h(compatibleWith traitCollection: UIKit.UITraitCollection? = nil) -> UIKit.UIImage? {
+      return UIKit.UIImage(resource: R.image.default568h, compatibleWith: traitCollection)
+    }
+    
     fileprivate init() {}
   }
   
@@ -51,28 +89,14 @@ struct R: Rswift.Validatable {
     fileprivate init() {}
   }
   
-  /// This `R.storyboard` struct is generated, and contains static references to 3 storyboards.
+  /// This `R.storyboard` struct is generated, and contains static references to 1 storyboards.
   struct storyboard {
-    /// Storyboard `Home`.
-    static let home = _R.storyboard.home()
     /// Storyboard `LaunchScreen`.
     static let launchScreen = _R.storyboard.launchScreen()
-    /// Storyboard `Main`.
-    static let main = _R.storyboard.main()
-    
-    /// `UIStoryboard(name: "Home", bundle: ...)`
-    static func home(_: Void = ()) -> UIKit.UIStoryboard {
-      return UIKit.UIStoryboard(resource: R.storyboard.home)
-    }
     
     /// `UIStoryboard(name: "LaunchScreen", bundle: ...)`
     static func launchScreen(_: Void = ()) -> UIKit.UIStoryboard {
       return UIKit.UIStoryboard(resource: R.storyboard.launchScreen)
-    }
-    
-    /// `UIStoryboard(name: "Main", bundle: ...)`
-    static func main(_: Void = ()) -> UIKit.UIStoryboard {
-      return UIKit.UIStoryboard(resource: R.storyboard.main)
     }
     
     fileprivate init() {}
@@ -102,27 +126,11 @@ struct _R {
   }
   
   struct storyboard {
-    struct home: Rswift.StoryboardResourceType {
-      let bundle = R.hostingBundle
-      let name = "Home"
-      
-      fileprivate init() {}
-    }
-    
     struct launchScreen: Rswift.StoryboardResourceWithInitialControllerType {
       typealias InitialController = UIKit.UIViewController
       
       let bundle = R.hostingBundle
       let name = "LaunchScreen"
-      
-      fileprivate init() {}
-    }
-    
-    struct main: Rswift.StoryboardResourceWithInitialControllerType {
-      typealias InitialController = ViewController
-      
-      let bundle = R.hostingBundle
-      let name = "Main"
       
       fileprivate init() {}
     }
