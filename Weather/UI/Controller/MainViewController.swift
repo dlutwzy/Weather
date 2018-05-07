@@ -10,6 +10,8 @@ import UIKit
 import CoreLocation
 import ForecastIO
 import SnapKit
+import RxSwift
+import RxCocoa
 
 enum InitializeViewType {
     case userSwitch
@@ -164,6 +166,125 @@ extension MainViewController {
             maker.height.equalToSuperview()
         }
     }
+    
+    private func updateEvent() {
+        
+        _ = futureConditionCollection.rx.observeWeakly(CGRect.self, "bounds")
+            .takeUntil(futureConditionCollection.rx.deallocated)
+            .subscribe(onNext: { [weak self] (_) in
+                self?.resetCollectionLayout(collection: self?.futureConditionCollection)
+            }, onError: nil, onCompleted: nil, onDisposed: nil)
+    }
+    
+    private func resetCollectionLayout(collection: UICollectionView?) {
+        
+        guard let collection = collection else {
+            return
+        }
+        
+        let layout = UICollectionViewFlowLayout()
+        
+        let frame = collection.bounds
+        let width = frame.width / 3.3
+        let height = frame.height
+        layout.itemSize = CGSize(width: width, height: height)
+        layout.minimumInteritemSpacing = 2.0
+        layout.minimumLineSpacing = 0.0
+        layout.scrollDirection = .horizontal
+        
+        collection.collectionViewLayout = layout
+    }
+}
+
+class FutureCollectionViewCell: UICollectionViewCell {
+    
+    var dayOfWeek: String? {
+        set { dayOfWeekLabel.text = newValue }
+        get { return dayOfWeekLabel.text }
+    }
+    
+    var condition: Climacons? {
+        set {
+            guard let newValue = newValue else {
+                return
+            }
+            conditionLabel.text = String(climacons: newValue)
+        }
+        get {
+            return Climacons(rawValue: conditionLabel.text ?? "")
+        }
+    }
+    
+    override init(frame: CGRect) {
+        
+        super.init(frame: frame)
+        
+        updateView()
+        updateLayout()
+    }
+    
+    private lazy var dayOfWeekLabel: UILabel = {
+        
+        let label = UILabel(frame: .zero)
+        
+        label.textAlignment = .center
+        label.font = UIFont.systemFont(ofSize: Default.weekdayFontSize)
+        label.textColor = UIColor.white
+        
+        return label
+    }()
+    
+    private lazy var conditionLabel: UILabel = {
+        
+        let label = UILabel(frame: .zero)
+        
+        label.textAlignment = .center
+        label.font = UIFont.systemFont(ofSize: Default.conditionFontSize)
+        label.textColor = UIColor.white
+        
+        return label
+    }()
+    
+    private struct Default {
+        static let weekdayFontSize: CGFloat = 17.0
+        static let conditionFontSize: CGFloat = 40.0
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+}
+
+extension FutureCollectionViewCell {
+    
+    private func updateView() {
+        
+        self.addSubview(dayOfWeekLabel)
+        self.addSubview(conditionLabel)
+    }
+    
+    private func updateLayout() {
+        
+        let weekdayLabelHeight = Default.weekdayFontSize * 2
+        let conditionLabelHeight = Default.conditionFontSize
+        let totalHeight = weekdayLabelHeight + conditionLabelHeight
+        let weekdayLabelCenterYOffset = weekdayLabelHeight/2 - totalHeight/2
+        let conditionLabelCenterYOffset = (weekdayLabelHeight + conditionLabelHeight/2) - totalHeight/2
+        
+        dayOfWeekLabel.snp.makeConstraints { (maker) in
+            maker.left.equalToSuperview()
+            maker.height.equalTo(weekdayLabelHeight)
+            maker.right.equalToSuperview()
+            maker.centerY.equalToSuperview().offset(weekdayLabelCenterYOffset)
+        }
+        
+        conditionLabel.snp.makeConstraints { (maker) in
+            maker.left.equalToSuperview()
+            maker.height.equalTo(conditionLabelHeight)
+            maker.right.equalToSuperview()
+            maker.centerY.equalToSuperview().offset(conditionLabelCenterYOffset)
+        }
+    }
 }
 
 extension MainViewController: CLLocationManagerDelegate {
@@ -191,3 +312,4 @@ extension MainViewController: CLLocationManagerDelegate {
 
     }
 }
+

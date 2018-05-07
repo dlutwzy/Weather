@@ -8,7 +8,7 @@
 
 import Foundation
 
-enum ClimaconsIcon: String {
+enum Climacons: String {
 
     case cloudDrizzleAlt = "\u{e900}"
     case cloudDrizzleMoon = "\u{e901}"
@@ -80,7 +80,7 @@ enum ClimaconsIcon: String {
 
 extension String {
 
-    init(climacons: ClimaconsIcon) {
+    init(climacons: Climacons) {
         self.init(climacons.rawValue)
     }
 }
