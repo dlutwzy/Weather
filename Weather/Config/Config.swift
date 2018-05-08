@@ -14,4 +14,22 @@ class Config {
     static let commonRightOffset: CGFloat = -15.0
     static let commonTopOffset: CGFloat = 15.0
     static let commonBottomOffset: CGFloat = -15.0
+    private static var heFengApiKey: String?
+    static var apiKey: String {
+        get {
+            if heFengApiKey == nil {
+                
+                do {
+                    guard let url = R.file.api_KEY() else {
+                        return ""
+                    }
+                    heFengApiKey = try String(contentsOf: url)
+                } catch {
+                    
+                }
+            }
+            
+            return heFengApiKey ?? ""
+        }
+    }
 }
