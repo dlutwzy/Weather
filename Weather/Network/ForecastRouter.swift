@@ -24,6 +24,7 @@ enum ForecastRouter: URLRequestConvertible, ForecastRouterReuqest {
 
     private struct StaticValue {
         static let baseURLString = "https://free-api.heweather.com/s6/weather"
+        static let key = "2daa7d371f9743f18e36a655e99cd1b9"
         static let lang = "en"
         static let unit = "m"
     }
@@ -42,7 +43,7 @@ enum ForecastRouter: URLRequestConvertible, ForecastRouterReuqest {
         let urlRequest = URLRequest(url: url.appendingPathComponent(result.path))
 
         var parameters = result.parameters
-        parameters["key"] = Config.apiKey
+        parameters["key"] = StaticValue.key
         parameters["lang"] = StaticValue.lang
         parameters["unit"] = StaticValue.unit
 

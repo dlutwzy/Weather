@@ -22,20 +22,12 @@ struct R: Rswift.Validatable {
     fileprivate init() {}
   }
   
-  /// This `R.file` struct is generated, and contains static references to 3 files.
+  /// This `R.file` struct is generated, and contains static references to 2 files.
   struct file {
-    /// Resource file `API_KEY`.
-    static let api_KEY = Rswift.FileResource(bundle: R.hostingBundle, name: "API_KEY", pathExtension: "")
     /// Resource file `Climacons.ttf`.
     static let climaconsTtf = Rswift.FileResource(bundle: R.hostingBundle, name: "Climacons", pathExtension: "ttf")
     /// Resource file `Default-568h@2x.png`.
     static let default568h2xPng = Rswift.FileResource(bundle: R.hostingBundle, name: "Default-568h@2x", pathExtension: "png")
-    
-    /// `bundle.url(forResource: "API_KEY", withExtension: "")`
-    static func api_KEY(_: Void = ()) -> Foundation.URL? {
-      let fileResource = R.file.api_KEY
-      return fileResource.bundle.url(forResource: fileResource)
-    }
     
     /// `bundle.url(forResource: "Climacons", withExtension: "ttf")`
     static func climaconsTtf(_: Void = ()) -> Foundation.URL? {
