@@ -204,15 +204,26 @@ class MainViewController: UIViewController {
         guard let location = userLocation else {
             return
         }
-
+        #if false
+        ForecastRouter.now(location: location).request()
+            .responseString { (response) in
+                guard let value = response.result.value else {
+                    return
+                }
+                print(value)
+        }
+        #else
         ForecastRequest.getForecast(location: location) { (result) in
             guard let result = result else {
                 return
             }
+            print(result)
             DispatchQueue.main.async { [weak self] in
                 self?.updateWeatherData(data: result)
             }
         }
+        #endif
+        
     }
 
     private func updateWeatherData(data: Forecast) {

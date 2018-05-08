@@ -8,77 +8,6 @@
 
 import Foundation
 
-struct Basic: Codable {
-
-    let cid: String?
-    let location: String?
-    let cnty: String?
-    let lat: String?
-    let lon: String?
-    let tz: String?
-
-    private enum CodingKeys: String, CodingKey {
-        case cid
-        case location
-        case cnty
-        case lat
-        case lon
-        case tz
-    }
-}
-
-extension Basic {
-
-    init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: Basic.CodingKeys.self)
-
-        cid = try container.decode(String.self, forKey: .cid)
-        location = try container.decode(String.self, forKey: .location)
-        cnty = try container.decode(String.self, forKey: .cnty)
-        lat = try container.decode(String.self, forKey: .lat)
-        lon = try container.decode(String.self, forKey: .lon)
-        tz = try container.decode(String.self, forKey: .tz)
-    }
-
-    func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: Basic.CodingKeys.self)
-
-        try container.encode(cid, forKey: .cid)
-        try container.encode(location, forKey: .location)
-        try container.encode(cnty, forKey: .cnty)
-        try container.encode(lat, forKey: .lat)
-        try container.encode(lon, forKey: .lon)
-        try container.encode(tz, forKey: .tz)
-    }
-}
-
-struct Update: Codable {
-
-    let loc: String?
-    let utc: String?
-
-    private enum CodingKeys: String, CodingKey {
-        case loc
-        case utc
-    }
-}
-extension Update {
-
-    init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: Update.CodingKeys.self)
-
-        loc = try container.decode(String.self, forKey: .loc)
-        utc = try container.decode(String.self, forKey: .utc)
-    }
-
-    func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: Update.CodingKeys.self)
-
-        try container.encode(loc, forKey: .loc)
-        try container.encode(utc, forKey: .utc)
-    }
-}
-
 struct DailyForecast: Codable {
 
     let condCodeD: String?
@@ -182,40 +111,94 @@ extension DailyForecast {
     }
 }
 
-struct HeWeather: Codable {
-
-    let basic: Basic?
-    let update: Update?
-    let status: String?
-    let dailyForecast: [DailyForecast]?
-
+class HeWeatherBase: Codable {
+    
+    var basic: LocationAttribute?
+    var update: UpdateTimestamp?
+    var status: String?
+    
+    required init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: HeWeatherBase.CodingKeys.self)
+        
+        basic = try container.decode(LocationAttribute.self, forKey: .basic)
+        update = try container.decode(UpdateTimestamp.self, forKey: .update)
+        status = try container.decode(String.self, forKey: .status)
+    }
+    
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: HeWeatherBase.CodingKeys.self)
+        
+        try container.encode(basic, forKey: .basic)
+        try container.encode(update, forKey: .update)
+        try container.encode(status, forKey: .status)
+    }
+    
     private enum CodingKeys: String, CodingKey {
         case basic
         case update
         case status
+    }
+}
+
+class HeWeather: HeWeatherBase {
+    
+    var dailyForecast: [DailyForecast]?
+    
+    required init(from decoder: Decoder) throws {
+        
+        let container = try decoder.container(keyedBy: HeWeather.CodingKeys.self)
+        dailyForecast = try container.decode([DailyForecast].self, forKey: .dailyForecast)
+        
+        try super.init(from: decoder)
+    }
+    
+    override func encode(to encoder: Encoder) throws {
+        
+        var container = encoder.container(keyedBy: HeWeather.CodingKeys.self)
+        try container.encode(dailyForecast, forKey: .dailyForecast)
+        
+        try super.encode(to: encoder)
+    }
+    
+    private enum CodingKeys: String, CodingKey {
         case dailyForecast = "daily_forecast"
     }
 }
-extension HeWeather {
 
-    init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: HeWeather.CodingKeys.self)
-
-        basic = try container.decode(Basic.self, forKey: .basic)
-        update = try container.decode(Update.self, forKey: .update)
-        status = try container.decode(String.self, forKey: .status)
-        dailyForecast = try container.decode([DailyForecast].self, forKey: .dailyForecast)
-    }
-
-    func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: HeWeather.CodingKeys.self)
-
-        try container.encode(basic, forKey: .basic)
-        try container.encode(update, forKey: .update)
-        try container.encode(status, forKey: .status)
-        try container.encode(dailyForecast, forKey: .dailyForecast)
-    }
-}
+//struct HeWeather: Codable {
+//
+//    let basic: LocationAttribute?
+//    let update: UpdateTimestamp?
+//    let status: String?
+//    let dailyForecast: [DailyForecast]?
+//
+//    private enum CodingKeys: String, CodingKey {
+//        case basic
+//        case update
+//        case status
+//        case dailyForecast = "daily_forecast"
+//    }
+//}
+//extension HeWeather {
+//
+//    init(from decoder: Decoder) throws {
+//        let container = try decoder.container(keyedBy: HeWeather.CodingKeys.self)
+//
+//        basic = try container.decode(LocationAttribute.self, forKey: .basic)
+//        update = try container.decode(UpdateTimestamp.self, forKey: .update)
+//        status = try container.decode(String.self, forKey: .status)
+//        dailyForecast = try container.decode([DailyForecast].self, forKey: .dailyForecast)
+//    }
+//
+//    func encode(to encoder: Encoder) throws {
+//        var container = encoder.container(keyedBy: HeWeather.CodingKeys.self)
+//
+//        try container.encode(basic, forKey: .basic)
+//        try container.encode(update, forKey: .update)
+//        try container.encode(status, forKey: .status)
+//        try container.encode(dailyForecast, forKey: .dailyForecast)
+//    }
+//}
 
 struct Forecast: Codable {
 

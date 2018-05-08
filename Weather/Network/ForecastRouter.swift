@@ -21,6 +21,7 @@ func AlamofireRequest(url: URLRequestConvertible)-> DataRequest {
 enum ForecastRouter: URLRequestConvertible, ForecastRouterReuqest {
 
     case forecast(location: CLLocation)
+    case now(location: CLLocation)
 
     private struct StaticValue {
         static let baseURLString = "https://free-api.heweather.com/s6/weather"
@@ -33,6 +34,10 @@ enum ForecastRouter: URLRequestConvertible, ForecastRouterReuqest {
             switch self {
             case .forecast(let location):
                 return ("/forecast",
+                        ["location": "\(location.coordinate.latitude),\(location.coordinate.longitude)"]
+                )
+            case .now(let location):
+                return ("/now",
                         ["location": "\(location.coordinate.latitude),\(location.coordinate.longitude)"]
                 )
             }
