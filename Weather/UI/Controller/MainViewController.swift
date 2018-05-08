@@ -8,7 +8,6 @@
 
 import UIKit
 import CoreLocation
-import ForecastIO
 import SnapKit
 import RxSwift
 import RxCocoa
@@ -39,7 +38,17 @@ class MainViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
 
-        conditionIconLabel.text = String(climacons: .cloud)
+        conditionIconLabel.text = String(climacons: .sun)
+        conditionDetailLabel.text = "Clear"
+        locationLabel.text = "Sana'a, Yemen"
+        currentTemperatureLabel.text = "13°"
+        lowestTemperatureLabel.text = "L 14"
+        highestTemperatureLabel.text = "H 29"
+
+        updateGradientLayerColor(fahrenheit: 15.0)
+
+        locationManager.requestWhenInUseAuthorization()
+        locationManager.startUpdatingLocation()
     }
 
     override func didReceiveMemoryWarning() {
@@ -47,7 +56,37 @@ class MainViewController: UIViewController {
         // Dispose of any resources that can be recreated.
     }
 
-    private let conditionContainerView: UIView = UIView()
+    private func updateGradientLayerColor(fahrenheit: CGFloat) {
+
+        gradientLayer.colors = ConditionColorType(fahrenheit: fahrenheit)?.colorPackage().map({
+            $0.cgColor
+        })
+    }
+
+    private lazy var gradientLayer: CAGradientLayer = {
+        let gradientLayer: CAGradientLayer = CAGradientLayer(layer: self.view.layer)
+
+        gradientLayer.colors = ConditionColorType(fahrenheit: 35.0)?.colorPackage().map({
+            $0.cgColor
+        })
+        gradientLayer.locations = [0.5, 1.0]
+
+        return gradientLayer
+    }()
+
+    private lazy var conditionContainerView: UIView = {
+
+        let view = UIView(frame: .zero)
+
+        let blurEffect = UIBlurEffect(style: UIBlurEffectStyle.light)
+        let effectView = UIVisualEffectView(effect: blurEffect)
+        effectView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+        effectView.alpha = Default.effectViewAlpha
+
+        view.addSubview(effectView)
+
+        return view
+    }()
 
     private lazy var conditionIconLabel: UILabel = {
 
@@ -114,9 +153,14 @@ class MainViewController: UIViewController {
         return label
     }()
 
-    private lazy var futureConditionCollection: UICollectionView = {
+    private lazy var futureConditionCollectionView: UICollectionView = {
 
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
+        collectionView.backgroundColor = UIColor.clear
+        collectionView.register(FutureCollectionViewCell.self,
+                                forCellWithReuseIdentifier: Default.futureCellIdentiifier)
+        collectionView.delegate = self
+        collectionView.dataSource = self
 
         return collectionView
     }()
@@ -131,23 +175,63 @@ class MainViewController: UIViewController {
         return manager
     }()
 
-    private lazy var dsClient: DarkSkyClient = {
-        
-        let client = DarkSkyClient(apiKey: Config.secretKey)
-        client.units = .si
-        client.language = .simplifiedChinese
-
-        return client
-    }()
+    var dataSource: [FutureCollectionViewCellModel]? {
+        didSet {
+            guard let _ = dataSource else {
+                return
+            }
+            self.futureConditionCollectionView.reloadData()
+        }
+    }
 
     private let updateSemaphore: DispatchSemaphore = DispatchSemaphore(value: 1)
+    private var userLocation: CLLocation? {
+        didSet {
+            guard let _ = userLocation else {
+                return
+            }
+            if updateSemaphore.wait(timeout: DispatchTime.now()) == .success {
+                locationManager.stopUpdatingLocation()
+                DispatchQueue.global(qos: .default).async { [weak self] in
+                    self?.getWeatherData()
+                    //self?.updateSemaphore.signal()
+                }
+            }
+        }
+    }
+
+    private func getWeatherData() {
+        guard let location = userLocation else {
+            return
+        }
+
+        ForecastRequest.getForecast(location: location) { (result) in
+            guard let result = result else {
+                return
+            }
+            DispatchQueue.main.async { [weak self] in
+                self?.updateWeatherData(data: result)
+            }
+        }
+    }
+
+    private func updateWeatherData(data: Forecast) {
+
+        conditionDetailLabel.text = ((data.heWeather![0] as HeWeather).dailyForecast![0] as DailyForecast).condTxtD
+//        conditionIconLabel.text = String(climacons: Climacons(icon: data.currently?.icon ?? .cloudy))
+//        currentTemperatureLabel.text = "\(data.currently?.temperature ?? 0)°"
+    }
 
     private struct Default {
-        static let conditionIconFontSize: CGFloat = 180.0
+        static let effectViewAlpha: CGFloat = 0.6
+        static let conditionIconHeight: CGFloat = 180.0
+        static let conditionIconFontSize: CGFloat = conditionIconHeight * 1.5
         static let conditionDetailFontSize: CGFloat = 45.0
         static let locationFontSize: CGFloat = 17.0
         static let currentTemperatureFontSize: CGFloat = 52.0
         static let commonTemperatureFontSize: CGFloat = 17.0
+        static let futureCellIdentiifier = "\(FutureCollectionViewCell.self)"
+        static let conditionContainerHeight: CGFloat = 80.0
     }
 }
 
@@ -155,24 +239,105 @@ extension MainViewController {
 
     private func updateView() {
 
+        self.view.layer.addSublayer(gradientLayer)
         self.view.addSubview(conditionIconLabel)
+        self.view.addSubview(conditionDetailLabel)
+        self.view.addSubview(locationLabel)
+
+        self.view.addSubview(conditionContainerView)
+
+        conditionContainerView.addSubview(temperatureContainerView)
+        conditionContainerView.addSubview(futureConditionCollectionView)
+
+        temperatureContainerView.addSubview(currentTemperatureLabel)
+        temperatureContainerView.addSubview(lowestTemperatureLabel)
+        temperatureContainerView.addSubview(highestTemperatureLabel)
+    }
+
+    private func updateGradientLayerLayout() {
+        gradientLayer.frame = self.view.layer.bounds
     }
 
     private func updateLayout() {
 
+        updateGradientLayerLayout()
+
         conditionIconLabel.snp.makeConstraints { (maker) in
-            maker.center.equalToSuperview()
-            maker.width.equalToSuperview()
-            maker.height.equalToSuperview()
+            maker.left.equalToSuperview()
+            maker.centerY.equalToSuperview().multipliedBy(0.5)
+            maker.right.equalToSuperview()
+            maker.height.equalTo(Default.conditionIconHeight)
+        }
+
+        conditionDetailLabel.snp.makeConstraints { (maker) in
+            maker.left.equalToSuperview()
+            maker.top.equalTo(conditionIconLabel.snp.bottom).offset(Config.commonTopOffset)
+            maker.right.equalToSuperview()
+            maker.height.equalTo(Default.conditionDetailFontSize)
+        }
+
+        locationLabel.snp.makeConstraints { (maker) in
+            maker.left.equalToSuperview()
+            maker.top.equalTo(conditionDetailLabel.snp.bottom).offset(Config.commonTopOffset)
+            maker.right.equalToSuperview()
+            maker.height.equalTo(Default.locationFontSize)
+        }
+
+        conditionContainerView.snp.makeConstraints { (maker) in
+            maker.left.equalToSuperview()
+            maker.top.equalTo(locationLabel.snp.bottom).offset(Config.commonTopOffset)
+            maker.right.equalToSuperview()
+            maker.height.equalTo(Default.conditionContainerHeight)
+        }
+
+        temperatureContainerView.snp.makeConstraints { (maker) in
+            maker.left.equalToSuperview().offset(Config.commonLeftOffset)
+            maker.top.equalToSuperview()
+            maker.width.equalTo(temperatureContainerView.snp.height)
+            maker.bottom.equalToSuperview()
+        }
+
+        futureConditionCollectionView.snp.makeConstraints { (maker) in
+            maker.left.equalTo(temperatureContainerView.snp.right).offset(Config.commonLeftOffset)
+            maker.top.equalToSuperview()
+            maker.right.equalToSuperview().offset(Config.commonRightOffset)
+            maker.bottom.equalToSuperview()
+        }
+
+        currentTemperatureLabel.snp.makeConstraints { (maker) in
+            maker.left.equalToSuperview()
+            maker.top.equalToSuperview()
+            maker.right.equalToSuperview()
+            maker.height.equalToSuperview().multipliedBy(0.75)
+        }
+
+        lowestTemperatureLabel.snp.makeConstraints { (maker) in
+            maker.left.equalToSuperview()
+            maker.top.equalTo(currentTemperatureLabel.snp.bottom)
+            maker.width.equalToSuperview().multipliedBy(0.5)
+            maker.bottom.equalToSuperview()
+        }
+
+        highestTemperatureLabel.snp.makeConstraints { (maker) in
+            maker.width.equalToSuperview().multipliedBy(0.5)
+            maker.top.equalTo(currentTemperatureLabel.snp.bottom)
+            maker.right.equalToSuperview()
+            maker.bottom.equalToSuperview()
         }
     }
     
     private func updateEvent() {
-        
-        _ = futureConditionCollection.rx.observeWeakly(CGRect.self, "bounds")
-            .takeUntil(futureConditionCollection.rx.deallocated)
+
+        _ = self.view.rx.observeWeakly(CGRect.self, "bounds")
+            .takeUntil(self.view.rx.deallocated)
             .subscribe(onNext: { [weak self] (_) in
-                self?.resetCollectionLayout(collection: self?.futureConditionCollection)
+                self?.updateGradientLayerLayout()
+            }, onError: nil, onCompleted: nil, onDisposed: nil)
+        
+        _ = futureConditionCollectionView.rx.observeWeakly(CGRect.self, "bounds")
+            .takeUntil(futureConditionCollectionView.rx.deallocated)
+            .subscribe(onNext: { [weak self] (_) in
+                self?.resetCollectionLayout(collection: self?.futureConditionCollectionView)
             }, onError: nil, onCompleted: nil, onDisposed: nil)
     }
     
@@ -196,95 +361,29 @@ extension MainViewController {
     }
 }
 
-class FutureCollectionViewCell: UICollectionViewCell {
-    
-    var dayOfWeek: String? {
-        set { dayOfWeekLabel.text = newValue }
-        get { return dayOfWeekLabel.text }
-    }
-    
-    var condition: Climacons? {
-        set {
-            guard let newValue = newValue else {
-                return
-            }
-            conditionLabel.text = String(climacons: newValue)
-        }
-        get {
-            return Climacons(rawValue: conditionLabel.text ?? "")
-        }
-    }
-    
-    override init(frame: CGRect) {
-        
-        super.init(frame: frame)
-        
-        updateView()
-        updateLayout()
-    }
-    
-    private lazy var dayOfWeekLabel: UILabel = {
-        
-        let label = UILabel(frame: .zero)
-        
-        label.textAlignment = .center
-        label.font = UIFont.systemFont(ofSize: Default.weekdayFontSize)
-        label.textColor = UIColor.white
-        
-        return label
-    }()
-    
-    private lazy var conditionLabel: UILabel = {
-        
-        let label = UILabel(frame: .zero)
-        
-        label.textAlignment = .center
-        label.font = UIFont.systemFont(ofSize: Default.conditionFontSize)
-        label.textColor = UIColor.white
-        
-        return label
-    }()
-    
-    private struct Default {
-        static let weekdayFontSize: CGFloat = 17.0
-        static let conditionFontSize: CGFloat = 40.0
-    }
-    
-    required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
+extension MainViewController: UICollectionViewDelegate {
+
 }
 
-extension FutureCollectionViewCell {
-    
-    private func updateView() {
-        
-        self.addSubview(dayOfWeekLabel)
-        self.addSubview(conditionLabel)
-    }
-    
-    private func updateLayout() {
-        
-        let weekdayLabelHeight = Default.weekdayFontSize * 2
-        let conditionLabelHeight = Default.conditionFontSize
-        let totalHeight = weekdayLabelHeight + conditionLabelHeight
-        let weekdayLabelCenterYOffset = weekdayLabelHeight/2 - totalHeight/2
-        let conditionLabelCenterYOffset = (weekdayLabelHeight + conditionLabelHeight/2) - totalHeight/2
-        
-        dayOfWeekLabel.snp.makeConstraints { (maker) in
-            maker.left.equalToSuperview()
-            maker.height.equalTo(weekdayLabelHeight)
-            maker.right.equalToSuperview()
-            maker.centerY.equalToSuperview().offset(weekdayLabelCenterYOffset)
+extension MainViewController: UICollectionViewDataSource {
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        guard let dataSource = dataSource else {
+            return 0
         }
-        
-        conditionLabel.snp.makeConstraints { (maker) in
-            maker.left.equalToSuperview()
-            maker.height.equalTo(conditionLabelHeight)
-            maker.right.equalToSuperview()
-            maker.centerY.equalToSuperview().offset(conditionLabelCenterYOffset)
-        }
+        return dataSource.count
     }
+
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: Default.futureCellIdentiifier,
+                                                      for: indexPath)
+
+        let futureConditionCell = cell as? FutureCollectionViewCell
+        futureConditionCell?.item = dataSource?[indexPath.row]
+
+        return cell
+    }
+
 }
 
 extension MainViewController: CLLocationManagerDelegate {
@@ -305,7 +404,7 @@ extension MainViewController: CLLocationManagerDelegate {
     }
 
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-
+        self.userLocation = locations.last
     }
 
     func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {

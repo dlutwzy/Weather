@@ -76,6 +76,33 @@ enum Climacons: String {
     case tornado = "\u{e93f}"
     case umbrella = "\u{e940}"
     case wind = "\u{e941}"
+
+//    init(icon: Icon) {
+//
+//        switch icon {
+//
+//        case .clearDay:
+//            self = .sun
+//        case .clearNight:
+//            self = .moon
+//        case .rain:
+//            self = .cloudDrizzle
+//        case .snow:
+//            self = .cloudSnow
+//        case .sleet:
+//            self = .cloudRainAlt
+//        case .wind:
+//            self = .wind
+//        case .fog:
+//            self = .cloudFog
+//        case .cloudy:
+//            self = .cloud
+//        case .partlyCloudyDay:
+//            self = .cloud
+//        case .partlyCloudyNight:
+//            self = .cloudMoon
+//        }
+//    }
 }
 
 extension String {

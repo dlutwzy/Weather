@@ -20,6 +20,14 @@
 		880A5318209FF5B900528A1C /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 880A5317209FF5B900528A1C /* Default-568h@2x.png */; };
 		880A531B20A056D300528A1C /* Climacons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 880A531A20A056D300528A1C /* Climacons.ttf */; };
 		880A531D20A0571100528A1C /* Climacons.swift in Sources */ = {isa = PBXBuildFile; fileRef = 880A531C20A0571100528A1C /* Climacons.swift */; };
+		880A531F20A1342D00528A1C /* FutureCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 880A531E20A1342D00528A1C /* FutureCollectionViewCell.swift */; };
+		880A532420A1779000528A1C /* UIColor+RGB.swift in Sources */ = {isa = PBXBuildFile; fileRef = 880A532320A1779000528A1C /* UIColor+RGB.swift */; };
+		880A532920A1905F00528A1C /* FutureCollectionViewCellModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 880A532820A1905F00528A1C /* FutureCollectionViewCellModel.swift */; };
+		880A532C20A192E300528A1C /* ConditionColorType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 880A532B20A192E300528A1C /* ConditionColorType.swift */; };
+		880A532E20A1AA1800528A1C /* ForecastRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 880A532D20A1AA1800528A1C /* ForecastRouter.swift */; };
+		880A533020A1AA7700528A1C /* Alamofire+JsonModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 880A532F20A1AA7700528A1C /* Alamofire+JsonModel.swift */; };
+		880A533220A1AAB700528A1C /* ForecastRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 880A533120A1AAB700528A1C /* ForecastRequest.swift */; };
+		889261C520A1B1DC0057AF2C /* Forecast.swift in Sources */ = {isa = PBXBuildFile; fileRef = 889261C420A1B1DC0057AF2C /* Forecast.swift */; };
 		E60B3F5C058C52FCDDCAC1A8 /* Pods_Weather.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 54D836198608E85BD7ECE33A /* Pods_Weather.framework */; };
 /* End PBXBuildFile section */
 
@@ -64,6 +72,14 @@
 		880A5317209FF5B900528A1C /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-568h@2x.png"; sourceTree = "<group>"; };
 		880A531A20A056D300528A1C /* Climacons.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Climacons.ttf; sourceTree = "<group>"; };
 		880A531C20A0571100528A1C /* Climacons.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Climacons.swift; sourceTree = "<group>"; };
+		880A531E20A1342D00528A1C /* FutureCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FutureCollectionViewCell.swift; sourceTree = "<group>"; };
+		880A532320A1779000528A1C /* UIColor+RGB.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIColor+RGB.swift"; sourceTree = "<group>"; };
+		880A532820A1905F00528A1C /* FutureCollectionViewCellModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FutureCollectionViewCellModel.swift; sourceTree = "<group>"; };
+		880A532B20A192E300528A1C /* ConditionColorType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConditionColorType.swift; sourceTree = "<group>"; };
+		880A532D20A1AA1800528A1C /* ForecastRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ForecastRouter.swift; sourceTree = "<group>"; };
+		880A532F20A1AA7700528A1C /* Alamofire+JsonModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Alamofire+JsonModel.swift"; sourceTree = "<group>"; };
+		880A533120A1AAB700528A1C /* ForecastRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ForecastRequest.swift; sourceTree = "<group>"; };
+		889261C420A1B1DC0057AF2C /* Forecast.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Forecast.swift; sourceTree = "<group>"; };
 		AE64938A98278C9E00A80673 /* Pods-Weather.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Weather.release.xcconfig"; path = "Pods/Target Support Files/Pods-Weather/Pods-Weather.release.xcconfig"; sourceTree = "<group>"; };
 		CFB597D07F82BA62B3380088 /* Pods-WeatherUITests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-WeatherUITests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-WeatherUITests/Pods-WeatherUITests.debug.xcconfig"; sourceTree = "<group>"; };
 		DAC8B7CAC8E40B11FB66FE31 /* Pods_WeatherUITests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_WeatherUITests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -137,8 +153,9 @@
 			isa = PBXGroup;
 			children = (
 				880A530D209FF3E500528A1C /* Config */,
-				880A531920A056C200528A1C /* Extensin */,
+				880A531920A056C200528A1C /* Extension */,
 				880A5310209FF4E200528A1C /* Network */,
+				880A532720A1904A00528A1C /* Model */,
 				553614D3201C606A00A839BF /* UI */,
 				880A5316209FF58100528A1C /* AppDeledate */,
 				553614D2201C5FF800A839BF /* Resources */,
@@ -206,6 +223,8 @@
 		880A5310209FF4E200528A1C /* Network */ = {
 			isa = PBXGroup;
 			children = (
+				880A532D20A1AA1800528A1C /* ForecastRouter.swift */,
+				880A533120A1AAB700528A1C /* ForecastRequest.swift */,
 			);
 			path = Network;
 			sourceTree = "<group>";
@@ -213,6 +232,7 @@
 		880A5312209FF51A00528A1C /* View */ = {
 			isa = PBXGroup;
 			children = (
+				880A531E20A1342D00528A1C /* FutureCollectionViewCell.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -233,12 +253,48 @@
 			path = AppDeledate;
 			sourceTree = "<group>";
 		};
-		880A531920A056C200528A1C /* Extensin */ = {
+		880A531920A056C200528A1C /* Extension */ = {
 			isa = PBXGroup;
 			children = (
 				880A531C20A0571100528A1C /* Climacons.swift */,
+				880A532320A1779000528A1C /* UIColor+RGB.swift */,
+				880A532F20A1AA7700528A1C /* Alamofire+JsonModel.swift */,
 			);
-			path = Extensin;
+			path = Extension;
+			sourceTree = "<group>";
+		};
+		880A532720A1904A00528A1C /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				889261C320A1B1B90057AF2C /* ForecastModel */,
+				889261C220A1B1AB0057AF2C /* CellModel */,
+				880A532A20A1922600528A1C /* Enum */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		880A532A20A1922600528A1C /* Enum */ = {
+			isa = PBXGroup;
+			children = (
+				880A532B20A192E300528A1C /* ConditionColorType.swift */,
+			);
+			path = Enum;
+			sourceTree = "<group>";
+		};
+		889261C220A1B1AB0057AF2C /* CellModel */ = {
+			isa = PBXGroup;
+			children = (
+				880A532820A1905F00528A1C /* FutureCollectionViewCellModel.swift */,
+			);
+			path = CellModel;
+			sourceTree = "<group>";
+		};
+		889261C320A1B1B90057AF2C /* ForecastModel */ = {
+			isa = PBXGroup;
+			children = (
+				889261C420A1B1DC0057AF2C /* Forecast.swift */,
+			);
+			path = ForecastModel;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -504,11 +560,19 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				880A533220A1AAB700528A1C /* ForecastRequest.swift in Sources */,
 				880A530F209FF3F400528A1C /* Config.swift in Sources */,
+				880A532920A1905F00528A1C /* FutureCollectionViewCellModel.swift in Sources */,
+				880A532420A1779000528A1C /* UIColor+RGB.swift in Sources */,
 				553614A4201C4BCC00A839BF /* AppDelegate.swift in Sources */,
 				553614D5201C654200A839BF /* R.generated.swift in Sources */,
+				880A532E20A1AA1800528A1C /* ForecastRouter.swift in Sources */,
+				889261C520A1B1DC0057AF2C /* Forecast.swift in Sources */,
+				880A531F20A1342D00528A1C /* FutureCollectionViewCell.swift in Sources */,
+				880A533020A1AA7700528A1C /* Alamofire+JsonModel.swift in Sources */,
 				880A531D20A0571100528A1C /* Climacons.swift in Sources */,
 				880A5315209FF55400528A1C /* MainViewController.swift in Sources */,
+				880A532C20A192E300528A1C /* ConditionColorType.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
