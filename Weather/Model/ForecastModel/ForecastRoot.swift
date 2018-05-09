@@ -8,6 +8,31 @@
 
 import Foundation
 
+class Forecast: HeWeatherBase {
+
+    var dailyForecast: [DailyForecast]?
+
+    required init(from decoder: Decoder) throws {
+
+        let container = try decoder.container(keyedBy: Forecast.CodingKeys.self)
+        dailyForecast = try container.decode([DailyForecast].self, forKey: .dailyForecast)
+
+        try super.init(from: decoder)
+    }
+
+    override func encode(to encoder: Encoder) throws {
+
+        var container = encoder.container(keyedBy: Forecast.CodingKeys.self)
+        try container.encode(dailyForecast, forKey: .dailyForecast)
+
+        try super.encode(to: encoder)
+    }
+
+    private enum CodingKeys: String, CodingKey {
+        case dailyForecast = "daily_forecast"
+    }
+}
+
 struct DailyForecast: Codable {
 
     let condCodeD: String?
@@ -56,6 +81,7 @@ struct DailyForecast: Codable {
         case windSpd = "wind_spd"
     }
 }
+
 extension DailyForecast {
 
     init(from decoder: Decoder) throws {
@@ -111,114 +137,25 @@ extension DailyForecast {
     }
 }
 
-class HeWeatherBase: Codable {
-    
-    var basic: LocationAttribute?
-    var update: UpdateTimestamp?
-    var status: String?
-    
-    required init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: HeWeatherBase.CodingKeys.self)
-        
-        basic = try container.decode(LocationAttribute.self, forKey: .basic)
-        update = try container.decode(UpdateTimestamp.self, forKey: .update)
-        status = try container.decode(String.self, forKey: .status)
-    }
-    
-    func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: HeWeatherBase.CodingKeys.self)
-        
-        try container.encode(basic, forKey: .basic)
-        try container.encode(update, forKey: .update)
-        try container.encode(status, forKey: .status)
-    }
-    
-    private enum CodingKeys: String, CodingKey {
-        case basic
-        case update
-        case status
-    }
-}
+struct ForecastRoot: Codable {
 
-class HeWeather: HeWeatherBase {
-    
-    var dailyForecast: [DailyForecast]?
-    
-    required init(from decoder: Decoder) throws {
-        
-        let container = try decoder.container(keyedBy: HeWeather.CodingKeys.self)
-        dailyForecast = try container.decode([DailyForecast].self, forKey: .dailyForecast)
-        
-        try super.init(from: decoder)
-    }
-    
-    override func encode(to encoder: Encoder) throws {
-        
-        var container = encoder.container(keyedBy: HeWeather.CodingKeys.self)
-        try container.encode(dailyForecast, forKey: .dailyForecast)
-        
-        try super.encode(to: encoder)
-    }
-    
-    private enum CodingKeys: String, CodingKey {
-        case dailyForecast = "daily_forecast"
-    }
-}
-
-//struct HeWeather: Codable {
-//
-//    let basic: LocationAttribute?
-//    let update: UpdateTimestamp?
-//    let status: String?
-//    let dailyForecast: [DailyForecast]?
-//
-//    private enum CodingKeys: String, CodingKey {
-//        case basic
-//        case update
-//        case status
-//        case dailyForecast = "daily_forecast"
-//    }
-//}
-//extension HeWeather {
-//
-//    init(from decoder: Decoder) throws {
-//        let container = try decoder.container(keyedBy: HeWeather.CodingKeys.self)
-//
-//        basic = try container.decode(LocationAttribute.self, forKey: .basic)
-//        update = try container.decode(UpdateTimestamp.self, forKey: .update)
-//        status = try container.decode(String.self, forKey: .status)
-//        dailyForecast = try container.decode([DailyForecast].self, forKey: .dailyForecast)
-//    }
-//
-//    func encode(to encoder: Encoder) throws {
-//        var container = encoder.container(keyedBy: HeWeather.CodingKeys.self)
-//
-//        try container.encode(basic, forKey: .basic)
-//        try container.encode(update, forKey: .update)
-//        try container.encode(status, forKey: .status)
-//        try container.encode(dailyForecast, forKey: .dailyForecast)
-//    }
-//}
-
-struct Forecast: Codable {
-
-    let heWeather: [HeWeather]?
+    let heWeather: [Forecast]?
 
     private enum CodingKeys: String, CodingKey {
         case heWeather = "HeWeather6"
     }
 }
 
-extension Forecast {
+extension ForecastRoot {
 
     init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: Forecast.CodingKeys.self)
+        let container = try decoder.container(keyedBy: ForecastRoot.CodingKeys.self)
 
-        heWeather = try container.decode([HeWeather].self, forKey: .heWeather)
+        heWeather = try container.decode([Forecast].self, forKey: .heWeather)
     }
 
     func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: Forecast.CodingKeys.self)
+        var container = encoder.container(keyedBy: ForecastRoot.CodingKeys.self)
 
         try container.encode(heWeather, forKey: .heWeather)
     }

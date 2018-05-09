@@ -38,7 +38,10 @@ class MainViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
 
-        conditionIconLabel.text = String(climacons: .sun)
+//        conditionIconLabel.text = String(climacons: .sun)
+        UIImage.conditionImage(icon: .cloudy) { [weak self] (image) in
+            self?.conditionIconImageView.image = image
+        }
         conditionDetailLabel.text = "Clear"
         locationLabel.text = "Sana'a, Yemen"
         currentTemperatureLabel.text = "13°"
@@ -88,15 +91,11 @@ class MainViewController: UIViewController {
         return view
     }()
 
-    private lazy var conditionIconLabel: UILabel = {
+    private lazy var conditionIconImageView: UIImageView = {
 
-        let label = UILabel(frame: .zero)
+        let imageView = UIImageView(frame: .zero)
 
-        label.textAlignment = .center
-        label.textColor = UIColor.white
-        label.font = R.font.climacons(size: Default.conditionIconFontSize)
-
-        return label
+        return imageView
     }()
 
     private lazy var conditionDetailLabel: UILabel = {
@@ -201,10 +200,11 @@ class MainViewController: UIViewController {
     }
 
     private func getWeatherData() {
+        return
         guard let location = userLocation else {
             return
         }
-        #if false
+
         ForecastRouter.now(location: location).request()
             .responseString { (response) in
                 guard let value = response.result.value else {
@@ -212,30 +212,35 @@ class MainViewController: UIViewController {
                 }
                 print(value)
         }
-        #else
+
         ForecastRequest.getForecast(location: location) { (result) in
             guard let result = result else {
                 return
             }
             print(result)
             DispatchQueue.main.async { [weak self] in
-                self?.updateWeatherData(data: result)
+                self?.updateForecastData(data: result)
             }
         }
-        #endif
-        
     }
 
-    private func updateWeatherData(data: Forecast) {
+    private func updateConditionData(data: Condition) {
 
-        conditionDetailLabel.text = ((data.heWeather![0] as HeWeather).dailyForecast![0] as DailyForecast).condTxtD
+//        conditionIconLabel.text = data.current?.condCode
+        currentTemperatureLabel.text = "\(data.current?.tmp ?? "")°"
+//        lowestTemperatureLabel.text = "L \(data.current.)"
+    }
+
+    private func updateForecastData(data: Forecast) {
+
+        conditionDetailLabel.text = (data.dailyForecast![0] as DailyForecast).condTxtD
 //        conditionIconLabel.text = String(climacons: Climacons(icon: data.currently?.icon ?? .cloudy))
 //        currentTemperatureLabel.text = "\(data.currently?.temperature ?? 0)°"
     }
 
     private struct Default {
         static let effectViewAlpha: CGFloat = 0.6
-        static let conditionIconHeight: CGFloat = 180.0
+        static let conditionIconHeight: CGFloat = 150.0
         static let conditionIconFontSize: CGFloat = conditionIconHeight * 1.5
         static let conditionDetailFontSize: CGFloat = 45.0
         static let locationFontSize: CGFloat = 17.0
@@ -251,7 +256,7 @@ extension MainViewController {
     private func updateView() {
 
         self.view.layer.addSublayer(gradientLayer)
-        self.view.addSubview(conditionIconLabel)
+        self.view.addSubview(conditionIconImageView)
         self.view.addSubview(conditionDetailLabel)
         self.view.addSubview(locationLabel)
 
@@ -273,16 +278,16 @@ extension MainViewController {
 
         updateGradientLayerLayout()
 
-        conditionIconLabel.snp.makeConstraints { (maker) in
-            maker.left.equalToSuperview()
+        conditionIconImageView.snp.makeConstraints { (maker) in
             maker.centerY.equalToSuperview().multipliedBy(0.5)
-            maker.right.equalToSuperview()
+            maker.centerX.equalToSuperview()
+            maker.width.equalTo(Default.conditionIconHeight)
             maker.height.equalTo(Default.conditionIconHeight)
         }
 
         conditionDetailLabel.snp.makeConstraints { (maker) in
             maker.left.equalToSuperview()
-            maker.top.equalTo(conditionIconLabel.snp.bottom).offset(Config.commonTopOffset)
+            maker.top.equalTo(conditionIconImageView.snp.bottom).offset(Config.commonTopOffset)
             maker.right.equalToSuperview()
             maker.height.equalTo(Default.conditionDetailFontSize)
         }

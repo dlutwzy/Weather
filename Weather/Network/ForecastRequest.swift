@@ -15,14 +15,33 @@ class ForecastRequest {
                             responseBlcok: @escaping (Forecast?) -> Void) {
         ForecastRouter.forecast(location: location)
             .request()
-            .responseJModel(queue: DispatchQueue.global(qos: .background)) { (response: DataResponse<Forecast>) in
-                responseBlcok(response.result.value)
+            .responseJModel(queue: DispatchQueue.global(qos: .background)) { (response: DataResponse<ForecastRoot>) in
+                guard let heWeatherList = response.result.value?.heWeather else {
+                    responseBlcok(nil)
+                    return
+                }
+                if heWeatherList.count != 1 {
+                    responseBlcok(nil)
+                    return
+                }
+                responseBlcok(heWeatherList[0])
         }
     }
 
-//    static func getRankingBookDetail(rankingId: String, responseBlock: @escaping (RankingBookDetail?) -> Void) {
-//        BingeBookRouter.rankingDetail(rankingId: rankingId).request().responseString { (res) in
-//
-//        }
-//    }
+    static func getCurrentCondition(location: CLLocation,
+                                    responseBlcok: @escaping (Condition?) -> Void) {
+        ForecastRouter.now(location: location)
+            .request()
+            .responseJModel(queue: DispatchQueue.global(qos: .background)) { (response: DataResponse<ConditionRoot>) in
+                guard let heWeatherList = response.result.value?.heWeather else {
+                    responseBlcok(nil)
+                    return
+                }
+                if heWeatherList.count != 1 {
+                    responseBlcok(nil)
+                    return
+                }
+                responseBlcok(heWeatherList[0])
+        }
+    }
 }
