@@ -21,8 +21,8 @@ enum ConditionColorType: Int {
     case level9 // 245 46 35, 235 45 37
 
     init?(fahrenheit: CGFloat) {
-        let value = min(max(0, fahrenheit), 99)
-        self.init(rawValue: Int(value / 10))
+        let value = min(max(-30, fahrenheit), 69)
+        self.init(rawValue: Int(value / 10 + 3.0))
     }
 
     func colorPackage() -> [UIColor] {

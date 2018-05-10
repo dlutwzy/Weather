@@ -25,7 +25,7 @@ enum ForecastRouter: URLRequestConvertible, ForecastRouterReuqest {
 
     private struct StaticValue {
         static let baseURLString = "https://free-api.heweather.com/s6/weather"
-        static let lang = "en"
+        static let lang = LanguageType.chinese
         static let unit = "m"
     }
 
@@ -48,7 +48,7 @@ enum ForecastRouter: URLRequestConvertible, ForecastRouterReuqest {
 
         var parameters = result.parameters
         parameters["key"] = Config.apiKey
-        parameters["lang"] = StaticValue.lang
+        parameters["lang"] = StaticValue.lang.rawValue
         parameters["unit"] = StaticValue.unit
 
         return try URLEncoding.default.encode(urlRequest, with: parameters)

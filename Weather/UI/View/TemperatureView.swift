@@ -10,6 +10,33 @@ import UIKit
 
 class TemperatureView: UIView {
 
+    var currentTemperature: Int? {
+        didSet {
+            guard let currentTemperature = currentTemperature else {
+                return
+            }
+            currentLabel.text = "\(currentTemperature)°"
+        }
+    }
+
+    var lowestTemperature: Int? {
+        didSet {
+            guard let lowestTemperature = lowestTemperature else {
+                return
+            }
+            lowestLabel.text = "L \(lowestTemperature)"
+        }
+    }
+
+    var highestTemperature: Int? {
+        didSet {
+            guard let highestTemperature = highestTemperature else {
+                return
+            }
+            highestLabel.text = "H \(highestTemperature)"
+        }
+    }
+
     override init(frame: CGRect) {
 
         super.init(frame: frame)

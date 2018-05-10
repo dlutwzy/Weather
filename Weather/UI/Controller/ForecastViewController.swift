@@ -1,8 +1,8 @@
 //
-//  MainViewController.swift
+//  ForecastViewController.swift
 //  Weather
 //
-//  Created by iMac on 2018/5/7.
+//  Created by iMac on 2018/5/10.
 //  Copyright © 2018年 iMac. All rights reserved.
 //
 
@@ -12,7 +12,7 @@ import SnapKit
 import RxSwift
 import RxCocoa
 
-class MainViewController: UIViewController {
+class ForecastViewController: UIViewController {
 
     override func loadView() {
         super.loadView()
@@ -32,26 +32,11 @@ class MainViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
 
         super.viewWillAppear(animated)
-
-        locationManager.requestWhenInUseAuthorization()
-        locationManager.startUpdatingLocation()
-    }
-
-    private func updateGradientLayerColor(fahrenheit: CGFloat) {
-
-        gradientLayer.colors = ConditionColorType(fahrenheit: fahrenheit)?.colorPackage().map({
-            $0.cgColor
-        })
-        gradientLayer.locations = [0.5, 1.0]
     }
 
     private lazy var gradientLayer: CAGradientLayer = {
-        let gradientLayer: CAGradientLayer = CAGradientLayer(layer: self.view.layer)
 
-        gradientLayer.colors = ConditionColorType(fahrenheit: 15.0)?.colorPackage().map({
-            $0.cgColor
-        })
-        gradientLayer.locations = [0.5, 1.0]
+        let gradientLayer: CAGradientLayer = CAGradientLayer(layer: self.view.layer)
 
         return gradientLayer
     }()
@@ -96,21 +81,7 @@ class MainViewController: UIViewController {
         return collectionView
     }()
 
-//    private lazy var refreshButton: UIButton = {
-//        let button = UIButton(type: UIButtonType.)
-//    }()
-
-    private lazy var locationManager: CLLocationManager = {
-        
-        let manager = CLLocationManager()
-        manager.desiredAccuracy = kCLLocationAccuracyThreeKilometers
-        manager.distanceFilter = kCLLocationAccuracyThreeKilometers
-        manager.delegate = self
-
-        return manager
-    }()
-
-    var dataSource: [FutureCollectionViewCellModel]? {
+    private var dataSource: [FutureCollectionViewCellModel]? {
         didSet {
             guard let _ = dataSource else {
                 return
@@ -119,18 +90,13 @@ class MainViewController: UIViewController {
         }
     }
 
-    private let updateSemaphore: DispatchSemaphore = DispatchSemaphore(value: 1)
     private var userLocation: CLLocation? {
         didSet {
-            guard let _ = userLocation else {
+            guard let location = userLocation else {
                 return
             }
-            if updateSemaphore.wait(timeout: DispatchTime.now()) == .success {
-                locationManager.stopUpdatingLocation()
-                DispatchQueue.global(qos: .default).async { [weak self] in
-                    self?.getWeatherData()
-                    self?.updateSemaphore.signal()
-                }
+            DispatchQueue.global(qos: .default).async { [weak self] in
+                self?.getWeatherData(location: location)
             }
         }
     }
@@ -150,53 +116,47 @@ class MainViewController: UIViewController {
     }
 }
 
-extension MainViewController {
+extension ForecastViewController {
 
-    private func getWeatherData() {
-
-        guard let location = userLocation else {
-            return
-        }
+    private func getWeatherData(location: CLLocation) {
 
         ForecastRequest.getCurrentCondition(location: location) { (result) in
+
             guard let result = result else {
                 return
             }
-
-            print(result)
             DispatchQueue.main.async { [weak self] in
-                self?.updateConditionData(data: result)
+                self?.updateConditionData(condition: result)
             }
         }
 
         ForecastRequest.getForecast(location: location) { (result) in
+            
             guard let result = result else {
                 return
             }
-
-            print(result)
             DispatchQueue.main.async { [weak self] in
-                self?.updateForecastData(data: result)
+                self?.updateForecastData(forecast: result)
             }
         }
     }
 
-    private func updateConditionData(data: Condition) {
+    private func updateConditionData(condition: Condition) {
 
-        conditionIconLabel.text = data.current?.condCode?.climacon.stringValue
-        conditionDetailLabel.text = data.current?.condTxt
+        conditionIconLabel.text = condition.current?.condCode?.climacon.stringValue
+        conditionDetailLabel.text = condition.current?.condTxt
 
         var locationList = [String]()
-        if let loc = data.basic?.location {
+        if let loc = condition.basic?.location {
             locationList.append(loc)
         }
-        if let parentLoc = data.basic?.parentCity {
+        if let parentLoc = condition.basic?.parentCity {
             locationList.append(parentLoc)
         }
-        if let adminArea = data.basic?.adminArea {
+        if let adminArea = condition.basic?.adminArea {
             locationList.append(adminArea)
         }
-        if let cnty = data.basic?.cnty {
+        if let cnty = condition.basic?.cnty {
             locationList.append(cnty)
         }
         var locationStr = ""
@@ -208,13 +168,13 @@ extension MainViewController {
         }
         locationLabel.text = locationStr.capitalized
 
-        temperatureView.currentTemperature = data.current?.tmp
-        updateGradientLayerColor(fahrenheit: CGFloat(data.current?.tmp ?? 0))
+        temperatureView.currentTemperature = condition.current?.tmp
+        updateGradientLayerColor(fahrenheit: CGFloat(condition.current?.tmp ?? 0))
     }
 
-    private func updateForecastData(data: Forecast) {
+    private func updateForecastData(forecast: Forecast) {
 
-        guard let forecastList = data.dailyForecast else {
+        guard let forecastList = forecast.dailyForecast else {
             return
         }
 
@@ -229,13 +189,11 @@ extension MainViewController {
                 let condition = forecast.condCodeD {
 
                 let dateFormat = DateFormatter()
-                dateFormat.timeZone = TimeZone(identifier: "+0800")
                 dateFormat.dateFormat = "yyyy-MM-dd"
 
                 let dateStr = dateFormat.string(from: Date())
 
-                dateFormat.dateFormat = "yyyy-MM-dd hh:mm:ss Z"
-                let todayDate = dateFormat.date(from: dateStr + " 12:00:00 +0800")
+                let todayDate = dateFormat.date(from: dateStr)
                 if todayDate == date {
                     temperatureView.lowestTemperature = forecast.tmpMin
                     temperatureView.highestTemperature = forecast.tmpMax
@@ -251,15 +209,16 @@ extension MainViewController {
         }
         forecastCollectionView.reloadData()
 
-        conditionDetailLabel.text = (data.dailyForecast![0] as DailyForecast).condTxtD
+        conditionDetailLabel.text = (forecast.dailyForecast![0] as DailyForecast).condTxtD
     }
 }
 
-extension MainViewController {
+extension ForecastViewController {
 
     private func updateView() {
 
         self.view.layer.addSublayer(gradientLayer)
+
         self.view.addSubview(conditionIconLabel)
         self.view.addSubview(conditionDetailLabel)
         self.view.addSubview(locationLabel)
@@ -320,7 +279,15 @@ extension MainViewController {
             maker.bottom.equalToSuperview().offset(-5.0)
         }
     }
-    
+
+    private func updateGradientLayerColor(fahrenheit: CGFloat) {
+
+        gradientLayer.colors = ConditionColorType(fahrenheit: fahrenheit)?.colorPackage().map({
+            $0.cgColor
+        })
+        gradientLayer.locations = [0.5, 1.0]
+    }
+
     private func updateEvent() {
 
 
@@ -328,25 +295,25 @@ extension MainViewController {
             .takeUntil(self.view.rx.deallocated)
             .subscribe(onNext: { [weak self] (_) in
                 self?.updateGradientLayerLayout()
-            }, onError: nil, onCompleted: nil, onDisposed: nil)
+                }, onError: nil, onCompleted: nil, onDisposed: nil)
             .disposed(by: self.disposeBag)
-        
+
         forecastCollectionView.rx.observeWeakly(CGRect.self, "bounds")
             .takeUntil(forecastCollectionView.rx.deallocated)
             .subscribe(onNext: { [weak self] (_) in
                 self?.resetCollectionLayout(collection: self?.forecastCollectionView)
-            }, onError: nil, onCompleted: nil, onDisposed: nil)
+                }, onError: nil, onCompleted: nil, onDisposed: nil)
             .disposed(by: self.disposeBag)
     }
-    
+
     private func resetCollectionLayout(collection: UICollectionView?) {
-        
+
         guard let collection = collection else {
             return
         }
-        
+
         let layout = UICollectionViewFlowLayout()
-        
+
         let frame = collection.bounds
         let width = frame.width / 3.0
         let height = frame.height
@@ -354,16 +321,16 @@ extension MainViewController {
         layout.minimumInteritemSpacing = 0.0
         layout.minimumLineSpacing = 0.0
         layout.scrollDirection = .horizontal
-        
+
         collection.collectionViewLayout = layout
     }
 }
 
-extension MainViewController: UICollectionViewDelegate {
+extension ForecastViewController: UICollectionViewDelegate {
 
 }
 
-extension MainViewController: UICollectionViewDataSource {
+extension ForecastViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         guard let dataSource = dataSource else {
             return 0
@@ -383,30 +350,3 @@ extension MainViewController: UICollectionViewDataSource {
     }
 
 }
-
-extension MainViewController: CLLocationManagerDelegate {
-    func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
-        switch status {
-
-        case .notDetermined:
-            break
-        case .restricted:
-            break
-        case .denied:
-            break
-        case .authorizedAlways:
-            fallthrough
-        case .authorizedWhenInUse:
-            break
-        }
-    }
-
-    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        self.userLocation = locations.last
-    }
-
-    func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
-
-    }
-}
-

@@ -43,7 +43,7 @@ struct CurrentForecast: Codable {
     let hum: String?
     let pcpn: String?
     let pres: String?
-    let tmp: String?
+    let tmp: Int?
     let vis: String?
     let windDeg: String?
     let windDir: String?
@@ -80,7 +80,7 @@ extension CurrentForecast {
         hum = try container.decode(String.self, forKey: .hum)
         pcpn = try container.decode(String.self, forKey: .pcpn)
         pres = try container.decode(String.self, forKey: .pres)
-        tmp = try container.decode(String.self, forKey: .tmp)
+        tmp = Int(try container.decode(String.self, forKey: .tmp))
         vis = try container.decode(String.self, forKey: .vis)
         windDeg = try container.decode(String.self, forKey: .windDeg)
         windDir = try container.decode(String.self, forKey: .windDir)
@@ -98,7 +98,9 @@ extension CurrentForecast {
         try container.encode(hum, forKey: .hum)
         try container.encode(pcpn, forKey: .pcpn)
         try container.encode(pres, forKey: .pres)
-        try container.encode(tmp, forKey: .tmp)
+        if let tmp = tmp {
+            try container.encode("\(tmp)", forKey: .tmp)
+        }
         try container.encode(vis, forKey: .vis)
         try container.encode(windDeg, forKey: .windDeg)
         try container.encode(windDir, forKey: .windDir)

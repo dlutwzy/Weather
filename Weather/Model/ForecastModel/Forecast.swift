@@ -48,8 +48,8 @@ struct DailyForecast: Codable {
     let pres: String?
     let sr: String?
     let ss: String?
-    let tmpMax: String?
-    let tmpMin: String?
+    let tmpMax: Int?
+    let tmpMin: Int?
     let uvIndex: String?
     let vis: String?
     let windDeg: String?
@@ -96,8 +96,8 @@ extension DailyForecast {
 
         let dateStr = try container.decode(String.self, forKey: .date)
         let dateFormat = DateFormatter()
-        dateFormat.dateFormat = "yyyy-MM-dd"
-        date = dateFormat.date(from: dateStr)
+        dateFormat.dateFormat = "yyyy-MM-dd hh:mm:ss Z"
+        date = dateFormat.date(from: dateStr + " 12:00:00 +0800")
 
         hum = try container.decode(String.self, forKey: .hum)
         mr = try container.decode(String.self, forKey: .mr)
@@ -107,8 +107,8 @@ extension DailyForecast {
         pres = try container.decode(String.self, forKey: .pres)
         sr = try container.decode(String.self, forKey: .sr)
         ss = try container.decode(String.self, forKey: .ss)
-        tmpMax = try container.decode(String.self, forKey: .tmpMax)
-        tmpMin = try container.decode(String.self, forKey: .tmpMin)
+        tmpMax = Int(try container.decode(String.self, forKey: .tmpMax))
+        tmpMin = Int(try container.decode(String.self, forKey: .tmpMin))
         uvIndex = try container.decode(String.self, forKey: .uvIndex)
         vis = try container.decode(String.self, forKey: .vis)
         windDeg = try container.decode(String.self, forKey: .windDeg)
@@ -127,7 +127,7 @@ extension DailyForecast {
 
         if let date = date {
             let dateFormat = DateFormatter()
-            dateFormat.dateFormat = "yyyy-MM-dd"
+            dateFormat.dateFormat = "yyyy-MM-dd hh:mm:ss Z"
             try container.encode(dateFormat.string(from: date), forKey: .date)
         }
 
@@ -139,8 +139,12 @@ extension DailyForecast {
         try container.encode(pres, forKey: .pres)
         try container.encode(sr, forKey: .sr)
         try container.encode(ss, forKey: .ss)
-        try container.encode(tmpMax, forKey: .tmpMax)
-        try container.encode(tmpMin, forKey: .tmpMin)
+        if let tmpMax = tmpMax {
+            try container.encode("\(tmpMax)", forKey: .tmpMax)
+        }
+        if let tmpMin = tmpMin {
+            try container.encode("\(tmpMin)", forKey: .tmpMin)
+        }
         try container.encode(uvIndex, forKey: .uvIndex)
         try container.encode(vis, forKey: .vis)
         try container.encode(windDeg, forKey: .windDeg)
