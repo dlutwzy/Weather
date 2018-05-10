@@ -15,7 +15,7 @@ class FutureCollectionViewCell: UICollectionViewCell {
             guard let item = item else {
                 return
             }
-            dayOfWeekLabel.text = item.dayOfWeek
+            dayOfWeekLabel.text = item.dayOfWeek.stringValue
             conditionLabel.text = String(climacons: item.condition)
         }
     }
@@ -44,7 +44,7 @@ class FutureCollectionViewCell: UICollectionViewCell {
         let label = UILabel(frame: .zero)
 
         label.textAlignment = .center
-        label.font = UIFont.systemFont(ofSize: Default.conditionFontSize)
+        label.font = R.font.climacons(size: Default.conditionFontSize)
         label.textColor = UIColor.white
 
         return label

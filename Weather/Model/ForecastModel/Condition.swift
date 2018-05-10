@@ -37,7 +37,7 @@ class Condition: HeWeatherBase {
 struct CurrentForecast: Codable {
 
     let cloud: String?
-    let condCode: String?
+    let condCode: ConditionCode?
     let condTxt: String?
     let fl: String?
     let hum: String?
@@ -73,7 +73,8 @@ extension CurrentForecast {
         let container = try decoder.container(keyedBy: CurrentForecast.CodingKeys.self)
 
         cloud = try container.decode(String.self, forKey: .cloud)
-        condCode = try container.decode(String.self, forKey: .condCode)
+        let condCodeStr = try container.decode(String.self, forKey: .condCode)
+        condCode = ConditionCode(rawValue: Int(condCodeStr) ?? 999)
         condTxt = try container.decode(String.self, forKey: .condTxt)
         fl = try container.decode(String.self, forKey: .fl)
         hum = try container.decode(String.self, forKey: .hum)
@@ -91,7 +92,7 @@ extension CurrentForecast {
         var container = encoder.container(keyedBy: CurrentForecast.CodingKeys.self)
 
         try container.encode(cloud, forKey: .cloud)
-        try container.encode(condCode, forKey: .condCode)
+        try container.encode("\(condCode?.rawValue ?? 999)", forKey: .condCode)
         try container.encode(condTxt, forKey: .condTxt)
         try container.encode(fl, forKey: .fl)
         try container.encode(hum, forKey: .hum)

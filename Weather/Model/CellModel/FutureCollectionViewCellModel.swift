@@ -9,6 +9,6 @@
 import Foundation
 
 struct FutureCollectionViewCellModel {
-    var dayOfWeek: String
+    var dayOfWeek: DayOfWeek
     var condition: Climacons
 }

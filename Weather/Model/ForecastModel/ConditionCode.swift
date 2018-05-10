@@ -82,97 +82,97 @@ enum ConditionCode: Int {
         case .overcast:
             return .cloud
         case .windy:
-            return .cloud
+            return .wind
         case .calm:
-            return .cloud
+            return .sun
         case .lightBreeze:
-            return .cloud
+            return .wind
         case .moderate:
-            return .cloud
+            return .wind
         case .freshBreeze:
-            return .cloud
+            return .wind
         case .strongBreeze:
-            return .cloud
+            return .wind
         case .highWind:
-            return .cloud
+            return .wind
         case .gale:
-            return .cloud
+            return .wind
         case .strongGale:
-            return .cloud
+            return .wind
         case .storm:
-            return .cloud
+            return .wind
         case .violentStorm:
-            return .cloud
+            return .wind
         case .hurricane:
-            return .cloud
+            return .wind
         case .tornado:
-            return .cloud
+            return .wind
         case .tropicalStorm:
-            return .cloud
+            return .wind
         case .showerRain:
-            return .cloud
+            return .cloudRainAlt
         case .heavyShowerRain:
-            return .cloud
+            return .cloudHail
         case .thunderShower:
-            return .cloud
+            return .cloudHail
         case .heavyThunderStorm:
-            return .cloud
+            return .cloudHailAlt
         case .hail:
-            return .cloud
+            return .cloudHail
         case .lightRain:
-            return .cloud
+            return .cloudRainAlt
         case .moderateRain:
-            return .cloud
+            return .cloudHail
         case .heavyRain:
-            return .cloud
+            return .cloudHailAlt
         case .extremeRain:
-            return .cloud
+            return .cloudHailAlt
         case .drizzleRain:
-            return .cloud
+            return .cloudRainAlt
         case .stormRain:
-            return .cloud
+            return .cloudHail
         case .heavyStormRain:
-            return .cloud
+            return .cloudHailAlt
         case .severeStormRain:
-            return .cloud
+            return .cloudHailAlt
         case .freezingRain:
-            return .cloud
+            return .cloudHail
         case .lightSnow:
-            return .cloud
+            return .cloudSnow
         case .moderateSnow:
-            return .cloud
+            return .cloudSnow
         case .heavySnow:
-            return .cloud
+            return .cloudSnow
         case .snowstorm:
-            return .cloud
+            return .cloudSnow
         case .sleet:
-            return .cloud
+            return .cloudHail
         case .rainAndSnow:
-            return .cloud
+            return .cloudHail
         case .showerSnow:
-            return .cloud
+            return .cloudSnow
         case .snowFlurry:
-            return .cloud
+            return .cloudSnow
         case .mist:
-            return .cloud
+            return .cloudFog
         case .foggy:
-            return .cloud
+            return .cloudFogAlt
         case .haze:
-            return .cloud
+            return .cloudFogAlt
         case .sand:
-            return .cloud
+            return .cloudFogAlt
         case .dust:
-            return .cloud
+            return .cloudFogAlt
         case .duststorm:
-            return .cloud
+            return .cloudFogAlt
         case .sandstorm:
-            return .cloud
+            return .cloudFogAlt
         case .hot:
-            return .cloud
+            return .thermometer100
         case .cold:
-            return .cloud
+            return .thermometerZero
         case .unknown:
-            return .cloud
+            return .tornado
         }
     }
 }

@@ -35,11 +35,11 @@ class Forecast: HeWeatherBase {
 
 struct DailyForecast: Codable {
 
-    let condCodeD: String?
-    let condCodeN: String?
+    let condCodeD: ConditionCode?
+    let condCodeN: ConditionCode?
     let condTxtD: String?
     let condTxtN: String?
-    let date: String?
+    let date: Date?
     let hum: String?
     let mr: String?
     let ms: String?
@@ -87,11 +87,18 @@ extension DailyForecast {
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: DailyForecast.CodingKeys.self)
 
-        condCodeD = try container.decode(String.self, forKey: .condCodeD)
-        condCodeN = try container.decode(String.self, forKey: .condCodeN)
+        let condCodeDStr = try container.decode(String.self, forKey: .condCodeD)
+        condCodeD = ConditionCode(rawValue: Int(condCodeDStr) ?? 999)
+        let condCodeNStr = try container.decode(String.self, forKey: .condCodeN)
+        condCodeN = ConditionCode(rawValue: Int(condCodeNStr) ?? 999)
         condTxtD = try container.decode(String.self, forKey: .condTxtD)
         condTxtN = try container.decode(String.self, forKey: .condTxtN)
-        date = try container.decode(String.self, forKey: .date)
+
+        let dateStr = try container.decode(String.self, forKey: .date)
+        let dateFormat = DateFormatter()
+        dateFormat.dateFormat = "yyyy-MM-dd"
+        date = dateFormat.date(from: dateStr)
+
         hum = try container.decode(String.self, forKey: .hum)
         mr = try container.decode(String.self, forKey: .mr)
         ms = try container.decode(String.self, forKey: .ms)
@@ -113,11 +120,17 @@ extension DailyForecast {
     func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: DailyForecast.CodingKeys.self)
 
-        try container.encode(condCodeD, forKey: .condCodeD)
-        try container.encode(condCodeN, forKey: .condCodeN)
+        try container.encode("\(condCodeD?.rawValue ?? 999)", forKey: .condCodeD)
+        try container.encode("\(condCodeN?.rawValue ?? 999)", forKey: .condCodeN)
         try container.encode(condTxtD, forKey: .condTxtD)
         try container.encode(condTxtN, forKey: .condTxtN)
-        try container.encode(date, forKey: .date)
+
+        if let date = date {
+            let dateFormat = DateFormatter()
+            dateFormat.dateFormat = "yyyy-MM-dd"
+            try container.encode(dateFormat.string(from: date), forKey: .date)
+        }
+
         try container.encode(hum, forKey: .hum)
         try container.encode(mr, forKey: .mr)
         try container.encode(ms, forKey: .ms)

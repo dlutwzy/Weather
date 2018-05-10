@@ -76,6 +76,10 @@ enum Climacons: String {
     case tornado = "\u{e93f}"
     case umbrella = "\u{e940}"
     case wind = "\u{e941}"
+
+    var stringValue: String? {
+        return self.rawValue
+    }
 }
 
 extension String {
